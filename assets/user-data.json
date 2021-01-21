@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "firstName": "Bryan",
+    "lastName": "Corneliussen",
+    "email": "bcorneliussen0@virginia.edu",
+    "vacationDateCount": 94,
+    "roleId": 1
+  },
+  {
+    "id": 2,
+    "firstName": "Dasha",
+    "lastName": "Beaney",
+    "email": "dbeaney1@jigsy.com",
+    "vacationDateCount": 6,
+    "roleId": 1
+  },
+  {
+    "id": 3,
+    "firstName": "Cornie",
+    "lastName": "Geddis",
+    "email": "cgeddis2@cbslocal.com",
+    "vacationDateCount": 71,
+    "roleId": 2
+  },
+  {
+    "id": 4,
+    "firstName": "Gerik",
+    "lastName": "Soigne",
+    "email": "gsoigne3@sogou.com",
+    "vacationDateCount": 27,
+    "roleId": 2
+  },
+  {
+    "id": 5,
+    "firstName": "Rosanna",
+    "lastName": "Woodeson",
+    "email": "rwoodeson4@over-blog.com",
+    "vacationDateCount": 49,
+    "roleId": 2
+  }
+]
