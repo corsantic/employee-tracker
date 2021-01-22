@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:employeetracker/components/vacation-request-dialog.dart';
+import 'package:employeetracker/model/enum/vacation-status.enum.dart';
 import 'package:employeetracker/model/vacation-request.dart';
 import 'package:employeetracker/services/employee-service.dart';
 import 'package:employeetracker/util/utilities.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'model/enum/role.enum.dart';
 import 'model/user.dart';
 
 void main() {
@@ -20,7 +22,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Employee Tracker',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.blueGrey,
+        // accentColor: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Employee Tracker'),
@@ -99,6 +102,28 @@ class _MyHomePageState extends State<MyHomePage> {
                                   "${getSelectedVacationDateInDays(vacationRequest)} day vacation selected"),
                               Text(
                                   "Description: ${vacationRequest.description}"),
+                              getStatusIcon(vacationRequest.status),
+                              isEditable(vacationRequest)
+                                  ? Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        RaisedButton(
+                                          onPressed: () {},
+                                          color: Colors.green,
+                                          child: Text(
+                                            "Approve",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                        RaisedButton(
+                                          onPressed: () {},
+                                          color: Colors.red,
+                                          child: Text("Decline"),
+                                        ),
+                                      ],
+                                    )
+                                  : Container(),
                             ],
                           ),
                         ),
@@ -115,6 +140,33 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  bool isEditable(VacationRequest vacationRequest) {
+    return vacationRequest.status == VacationStatus.InProgress &&
+        RoleEnum.values.singleWhere((r) => r.index == selectedUser.roleId) ==
+            RoleEnum.Employer;
+  }
+
+  getStatusIcon(VacationStatus status) {
+    switch (status) {
+      case VacationStatus.Approved:
+        return Icon(
+          Icons.check,
+          color: Colors.green,
+        );
+        break;
+      case VacationStatus.InProgress:
+        return Icon(
+          Icons.schedule,
+          color: Colors.orange,
+        );
+        break;
+      case VacationStatus.Declined:
+        return Icon(Icons.clear, color: Colors.red);
+        break;
+      default:
+    }
   }
 
   makeVacationRequest() async {
