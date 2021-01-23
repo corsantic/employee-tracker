@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:employeetracker/model/user.dart';
+import 'package:employeetracker/services/user-service.dart';
 import 'package:employeetracker/util/utilities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -37,6 +39,10 @@ class AuthenticateRepository {
       var userId = json.decode(response.body)['id'];
       storage.write(key: 'userId', value: userId.toString());
       String token = json.decode(response.body)['token'];
+
+      UserService.setUser(User.fromJson(json.decode(response.body)));
+      print(UserService.user.email);
+
       return token;
     } else if (response.statusCode == HttpStatus.unauthorized ||
         response.statusCode == HttpStatus.badRequest)

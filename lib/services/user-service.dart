@@ -1,5 +1,13 @@
-class UserService {
-  static var user;
+import 'package:employeetracker/model/user.dart';
 
-  setUser(int userId) {}
+class UserService {
+  static User _user;
+
+  static User get user {
+    return _user;
+  }
+
+  static setUser(user) {
+    _user = user;
+  }
 }

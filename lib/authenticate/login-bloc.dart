@@ -19,7 +19,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     @required this.authenticationBloc,
   })  : assert(authenticateRepository != null),
         assert(authenticationBloc != null);
-
+  @override
   LoginState get initialState => LoginInitial();
 
   @override
@@ -32,11 +32,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           username: event.username,
         );
         // var storeId =
-        // var userId = await storage.read(key: "userId");
+        var userId = await storage.read(key: "userId");
+        print(userId);
         //     await storeUserService.getStoreIdWithUserId(int.parse(userId),token);
         // print("storeId :  $storeId");
         // storage.write(key: 'storeId', value: storeId.toString());
-
         authenticationBloc.dispatch(LoggedIn(token: token));
         yield LoginInitial();
       } catch (error) {

@@ -171,7 +171,7 @@ class _LoginFormState extends State<LoginForm> {
                                                   ),
                                           ),
                                           (Text(
-                                            'Giriş',
+                                            'Login',
                                           ))
                                         ]),
                                     shape: RoundedRectangleBorder(
@@ -181,17 +181,6 @@ class _LoginFormState extends State<LoginForm> {
                             ),
                           ],
                         ),
-                        // Container(
-                        //   child: state is LoginLoading
-                        //       ? new SizedBox(
-                        //           width: 128.0,
-                        //           height: 5.0,
-                        //           child: new LinearProgressIndicator(
-                        //             backgroundColor: ThemeService
-                        //                 .StorexpressColors.dark[900],
-                        //           ))
-                        //       : null,
-                        // ),
                         SizedBox(
                             height: MediaQuery.of(context).viewInsets.bottom),
                       ],

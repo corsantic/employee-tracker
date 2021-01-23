@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     _authenticationBloc =
-        AuthenticationBloc(authenticateRepository: _authenticateRepository);
+        AuthenticationBloc(authenticationRepository: _authenticateRepository);
     _loginBloc = LoginBloc(
       authenticateRepository: _authenticateRepository,
       authenticationBloc: _authenticationBloc,
@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Giriş',
+          'Login',
         ),
       ),
       body: LoginForm(
