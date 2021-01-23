@@ -1,5 +1,5 @@
-import 'dart:convert';
-
+import 'package:bloc/bloc.dart';
+import 'package:employeetracker/authenticate/authenticate-repository.dart';
 import 'package:employeetracker/components/vacation-request-dialog.dart';
 import 'package:employeetracker/model/enum/vacation-status.enum.dart';
 import 'package:employeetracker/model/vacation-request.dart';
@@ -7,26 +7,100 @@ import 'package:employeetracker/services/employee-service.dart';
 import 'package:employeetracker/util/utilities.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_config/flutter_config.dart';
 
+import 'authenticate/authenticate-bloc.dart';
+import 'authenticate/authenticate-event.dart';
+import 'authenticate/authenticate-state.dart';
+import 'components/page/login-page.dart';
 import 'model/enum/role.enum.dart';
 import 'model/user.dart';
 
-void main() {
-  runApp(MyApp());
+class MyApp extends BlocDelegate {
+  @override
+  void onTransition(Transition transition) {
+    print(transition.toString());
+  }
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+void main() async {
+  BlocSupervisor().delegate = MyApp();
+  WidgetsFlutterBinding.ensureInitialized(); // Required by FlutterConfig
+  await FlutterConfig.loadEnvVariables();
+  FlutterConfig.variables.forEach((p, k) => print("${p}, ${k}"));
+
+  runApp(App(authenticateRepository: AuthenticateRepository()));
+}
+
+class App extends StatefulWidget {
+  final AuthenticateRepository authenticateRepository;
+
+  App({Key key, @required this.authenticateRepository}) : super(key: key);
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  AuthenticationBloc authenticationBloc;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  AuthenticateRepository get authenticateRepository =>
+      widget.authenticateRepository;
+
+  @override
+  void initState() {
+    authenticationBloc =
+        AuthenticationBloc(authenticateRepository: authenticateRepository);
+    authenticationBloc.dispatch(AppStarted());
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    authenticationBloc.dispose();
+
+    print("dispose main");
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Employee Tracker',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-        // accentColor: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return BlocProvider<AuthenticationBloc>(
+      bloc: authenticationBloc,
+      child: MaterialApp(
+        home: new Scaffold(
+          key: _scaffoldKey,
+          body: new Container(
+            child: new BlocBuilder<AuthenticationEvent, AuthenticationState>(
+              bloc: authenticationBloc,
+              builder: (BuildContext context, AuthenticationState state) {
+                if (state is AuthenticationUninitialized) {
+                  return Container(
+                    child: Text("uninitialized"),
+                  );
+                }
+                if (state is AuthenticationAuthenticated) {
+                  return MyHomePage(
+                    title: "Employee Control",
+                  );
+                }
+                if (state is AuthenticationUnauthenticated) {
+                  return LoginPage(
+                      authenticateRepository: authenticateRepository);
+                }
+                if (state is AuthenticationLoading) {
+                  return CircularProgressIndicator();
+                }
+                return Container(
+                  child: Text("blank"),
+                );
+              },
+            ),
+          ),
+        ),
       ),
-      home: MyHomePage(title: 'Employee Tracker'),
     );
   }
 }
