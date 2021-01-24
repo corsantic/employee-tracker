@@ -37,6 +37,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         //     await storeUserService.getStoreIdWithUserId(int.parse(userId),token);
         // print("storeId :  $storeId");
         // storage.write(key: 'storeId', value: storeId.toString());
+
         authenticationBloc.dispatch(LoggedIn(token: token));
         yield LoginInitial();
       } catch (error) {

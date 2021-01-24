@@ -34,7 +34,6 @@ class AuthenticationBloc
         try {
           // await setUserWithStorageUserId();
           print("authenticate");
-
           yield AuthenticationAuthenticated();
         } catch (error) {
           dispatch(LoggedOut());

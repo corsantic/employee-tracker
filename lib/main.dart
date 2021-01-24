@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:employeetracker/authenticate/authenticate-repository.dart';
 import 'package:employeetracker/components/page/splash-page.dart';
+import 'package:employeetracker/components/shared/loading.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -73,11 +74,9 @@ class _AppState extends State<App> {
             child: new BlocBuilder<AuthenticationEvent, AuthenticationState>(
               bloc: authenticationBloc,
               builder: (BuildContext context, AuthenticationState state) {
-                if (state is AuthenticationUninitialized) {
-                  return Container(
-                    child: Text("uninitialized"),
-                  );
-                }
+                // if (state is AuthenticationUninitialized) {
+                // return SplashPage();
+                // }
                 if (state is AuthenticationAuthenticated) {
                   return MyHomePage(
                     title: "Employee Control",
@@ -88,7 +87,7 @@ class _AppState extends State<App> {
                       authenticateRepository: authenticationRepository);
                 }
                 if (state is AuthenticationLoading) {
-                  return Center(child: CircularProgressIndicator());
+                  return LoadingIndicator();
                 }
                 return SplashPage();
               },
