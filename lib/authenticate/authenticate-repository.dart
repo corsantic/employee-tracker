@@ -32,25 +32,24 @@ class AuthenticateRepository {
       url,
       body: json.encode({'userName': username, 'password': password}),
       headers: {"Content-Type": "application/json"},
-    ).catchError((onError) async =>
-        throw await new Future.error("Hata oluştu $onError"));
+    ).catchError(
+        (onError) async => throw await new Future.error("Error: $onError"));
 
     if (response.statusCode == HttpStatus.ok) {
       var userId = json.decode(response.body)['id'];
       storage.write(key: 'userId', value: userId.toString());
       String token = json.decode(response.body)['token'];
 
-      UserService.setUser(User.fromJson(json.decode(response.body)));
-      print(UserService.user.email);
-
+      await UserService.setUser(User.fromJson(json.decode(response.body)));
+      print((await UserService.user).email);
       return token;
     } else if (response.statusCode == HttpStatus.unauthorized ||
         response.statusCode == HttpStatus.badRequest)
-      throw await new Future.error("Kullanıcı adı veya şifre hatalı");
+      throw await new Future.error("Username or password is not correct");
     else if (response.statusCode >= HttpStatus.internalServerError &&
         response.statusCode <= HttpStatus.networkAuthenticationRequired)
       throw await new Future.error(
-          "Sunucuya ulaşılamadı. Error Code: ${response.statusCode}");
+          "Cannot reach server. Error Code: ${response.statusCode}");
     else
       throw await new Future.error("Error");
   }

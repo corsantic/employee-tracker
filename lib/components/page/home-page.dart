@@ -7,14 +7,15 @@ import 'package:employeetracker/model/enum/vacation-status.enum.dart';
 import 'package:employeetracker/model/user.dart';
 import 'package:employeetracker/model/vacation-request.dart';
 import 'package:employeetracker/services/employee-service.dart';
+import 'package:employeetracker/services/user-service.dart';
 import 'package:employeetracker/util/utilities.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
+  MyHomePage({Key key, this.title}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -34,11 +35,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future setDate() async {
-    var userList = await employeeService.getJson();
-    var vacationReqList = await employeeService.getVacationRequests();
-    setState(() {
-      selectedUser = userList[1];
-      vacationRequestList = vacationReqList;
+    UserService.user.then((u) {
+      setState(() {
+        selectedUser = u;
+      });
     });
 
     print(selectedUser);
@@ -59,7 +59,17 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text('Drawer Header'),
+              child: selectedUser != null
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("${selectedUser?.email}"),
+                        Text("${selectedUser?.fullName}"),
+                        Text(
+                            "Vacation Day: ${selectedUser?.vacationDateCount}"),
+                      ],
+                    )
+                  : Container(),
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
@@ -89,12 +99,24 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-          vacationRequestList != null && vacationRequestList.isNotEmpty
-              ? Flexible(
-                  child: ListView.builder(
-                    itemCount: vacationRequestList.length,
+          Flexible(
+            child: FutureBuilder(
+                future: getVacationList(),
+                builder: (context, vacationSnap) {
+                  if (vacationSnap.connectionState == ConnectionState.none &&
+                      vacationSnap.hasData == null) {
+                    //print('project snapshot data is: ${projectSnap.data}');
+                    return Container();
+                  } else if (vacationSnap.connectionState ==
+                      ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  return ListView.builder(
+                    itemCount: vacationSnap.data.length,
                     itemBuilder: (BuildContext context, int index) {
-                      var vacationRequest = vacationRequestList[index];
+                      var vacationRequest = vacationSnap.data[index];
                       return Card(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -135,9 +157,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       );
                     },
-                  ),
-                )
-              : Container()
+                  );
+                }),
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -149,9 +171,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool isEditable(VacationRequest vacationRequest) {
-    return vacationRequest.status == VacationStatus.InProgress &&
-        RoleEnum.values.singleWhere((r) => r.index == selectedUser.roleId) ==
-            RoleEnum.Employer;
+    var userRole =
+        RoleEnum.values.singleWhere((r) => r.index == selectedUser.roleId);
+    if (userRole == RoleEnum.Employee) return false;
+
+    return vacationRequest.status == VacationStatus.InProgress;
   }
 
   getStatusIcon(VacationStatus status) {
@@ -193,5 +217,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void logout(AuthenticationBloc authenticationBloc) async {
     return authenticationBloc.dispatch(LoggedOut());
+  }
+
+  getVacationList() async {
+    var result = await employeeService.getVacationRequests();
+    return result;
   }
 }

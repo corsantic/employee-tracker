@@ -1,7 +1,9 @@
 import 'package:employeetracker/authenticate/authenticate-bloc.dart';
+import 'package:employeetracker/authenticate/authenticate-event.dart';
 import 'package:employeetracker/authenticate/login-bloc.dart';
 import 'package:employeetracker/authenticate/login-event.dart';
 import 'package:employeetracker/authenticate/login-state.dart';
+import 'package:employeetracker/components/page/home-page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -221,7 +223,6 @@ class _LoginFormState extends State<LoginForm> {
       username: _usernameController.text,
       password: _passwordController.text,
     ));
-
     print("Button pressed");
   }
 }
