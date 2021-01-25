@@ -216,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
       1; //NOTE: add 1 because we are counting already selected date to
 
   void logout(AuthenticationBloc authenticationBloc) async {
-    return authenticationBloc.dispatch(LoggedOut());
+    return authenticationBloc.add(LoggedOut());
   }
 
   getVacationList() async {

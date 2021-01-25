@@ -16,7 +16,6 @@ class _LoadingIndicatorState extends State<LoadingIndicator> {
     final logoWidth = MediaQuery.of(context).size.width / 3;
     //// print("ARINTEL LOGO SIZE $logoWidth");
     return new Scaffold(
-      backgroundColor: Colors.black,
       body: new Center(
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,

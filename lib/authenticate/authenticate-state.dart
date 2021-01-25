@@ -1,39 +1,48 @@
+import 'package:employeetracker/model/user.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
-abstract class AuthenticationState extends Equatable {}
+abstract class AuthenticationState extends Equatable {
+  const AuthenticationState();
+
+  @override
+  List<Object> get props => [];
+}
 
 class AuthenticationUninitialized extends AuthenticationState {
   @override
   String toString() => 'AuthenticationUninitialized';
-
-  @override
-  // TODO: implement props
-  List<Object> get props => props;
 }
 
 class AuthenticationAuthenticated extends AuthenticationState {
   @override
   String toString() => 'AuthenticationAuthenticated';
+  final User user;
+
+  AuthenticationAuthenticated({@required this.user});
 
   @override
-  // TODO: implement props
-  List<Object> get props => props;
+  List<Object> get props => [user];
 }
 
 class AuthenticationUnauthenticated extends AuthenticationState {
   @override
   String toString() => 'AuthenticationUnauthenticated';
-
-  @override
-  // TODO: implement props
-  List<Object> get props => props;
 }
 
 class AuthenticationLoading extends AuthenticationState {
   @override
   String toString() => 'AuthenticationLoading';
+}
+
+class AuthenticationFailure extends AuthenticationState {
+  @override
+  String toString() => 'AuthenticationFailure';
+
+  final String message;
+
+  AuthenticationFailure({@required this.message});
 
   @override
-  // TODO: implement props
-  List<Object> get props => props;
+  List<Object> get props => [message];
 }

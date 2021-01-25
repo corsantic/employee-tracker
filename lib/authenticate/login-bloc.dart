@@ -18,9 +18,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     @required this.authenticateRepository,
     @required this.authenticationBloc,
   })  : assert(authenticateRepository != null),
-        assert(authenticationBloc != null);
-  @override
-  LoginState get initialState => LoginInitial();
+        assert(authenticationBloc != null),
+        super(LoginInitial());
 
   @override
   Stream<LoginState> mapEventToState(LoginEvent event) async* {
@@ -38,7 +37,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         // print("storeId :  $storeId");
         // storage.write(key: 'storeId', value: storeId.toString());
 
-        authenticationBloc.dispatch(LoggedIn(token: token));
+        authenticationBloc.add(LoggedIn(token: token));
         yield LoginInitial();
       } catch (error) {
         yield LoginFailure(error: error.toString());

@@ -1,4 +1,3 @@
-import 'package:bloc/bloc.dart';
 import 'package:employeetracker/authenticate/authenticate-repository.dart';
 import 'package:employeetracker/components/page/splash-page.dart';
 import 'package:employeetracker/components/shared/loading.dart';
@@ -14,7 +13,7 @@ import 'authenticate/authenticate-state.dart';
 import 'components/page/home-page.dart';
 import 'components/page/login-page.dart';
 
-class MyApp extends BlocDelegate {
+class MyApp {
   @override
   void onTransition(Transition transition) {
     print(transition.toString());
@@ -22,7 +21,7 @@ class MyApp extends BlocDelegate {
 }
 
 Future main() async {
-  BlocSupervisor().delegate = MyApp();
+  // BlocSupervisor().delegate = MyApp();
   WidgetsFlutterBinding.ensureInitialized(); // Required by FlutterConfig
   await FlutterConfig.loadEnvVariables();
   FlutterConfig.variables.forEach((p, k) => print("${p}, ${k}"));
@@ -48,35 +47,33 @@ class _AppState extends State<App> {
 
   @override
   void initState() {
-    authenticationBloc =
-        AuthenticationBloc(authenticationRepository: authenticationRepository);
-    authenticationBloc.dispatch(AppStarted());
+    authenticationBloc = AuthenticationBloc(authenticationRepository);
+    authenticationBloc.add(AppStarted());
     super.initState();
   }
 
   @override
   void dispose() {
-    authenticationBloc.dispose();
-
     print("dispose main");
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthenticationBloc>(
-      bloc: authenticationBloc,
+    return BlocProvider(
+      create: (BuildContext context) {
+        return authenticationBloc;
+      },
       child: MaterialApp(
         initialRoute: '/',
         home: new Scaffold(
           key: _scaffoldKey,
           body: new Container(
-            child: new BlocBuilder<AuthenticationEvent, AuthenticationState>(
-              bloc: authenticationBloc,
+            child: new BlocBuilder<AuthenticationBloc, AuthenticationState>(
               builder: (BuildContext context, AuthenticationState state) {
-                // if (state is AuthenticationUninitialized) {
-                // return SplashPage();
-                // }
+                if (state is AuthenticationUninitialized) {
+                  return SplashPage();
+                }
                 if (state is AuthenticationAuthenticated) {
                   return MyHomePage(
                     title: "Employee Control",
