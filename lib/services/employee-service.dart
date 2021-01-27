@@ -32,7 +32,7 @@ class EmployeeService {
     try {
       var isOk = await Utilities.checkResponse(response);
       if (isOk == true) {
-        return mapRequest(response);
+        return mapVacationListResponse(response);
       }
       return null;
     } catch (e) {
@@ -40,10 +40,31 @@ class EmployeeService {
     }
   }
 
-  mapRequest(http.Response response) {
+  mapVacationListResponse(http.Response response) {
     var vacationRequestList = (json.decode(response.body))
         .map<VacationRequest>((u) => VacationRequest.fromJson(u))
         .toList();
     return vacationRequestList;
+  }
+
+  Future<VacationRequest> changeStatus(
+      VacationRequestParameter vacationRequestParameter) async {
+    var url = "${FlutterConfig.get('API_URL')}/Vacation";
+    var token = await storage.read(key: 'access_token');
+    var body = json.encode(vacationRequestParameter.toJson());
+    final response = await http
+        .post(url, body: body, headers: Utilities.getHeaders(token))
+        .catchError(
+            (onError) async => throw await Future.error("Error: $onError"));
+
+    try {
+      var isOk = await Utilities.checkResponse(response);
+      if (isOk == true) {
+        return VacationRequest.fromJson(json.decode(response.body));
+      }
+      return null;
+    } catch (e) {
+      throw e;
+    }
   }
 }

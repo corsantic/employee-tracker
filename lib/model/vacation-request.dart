@@ -29,3 +29,15 @@ class VacationRequest {
 
   Map<String, dynamic> toJson() => _$VacationRequestToJson(this);
 }
+
+class VacationRequestParameter {
+  int vacationRequestId;
+  VacationStatus vacationStatus;
+
+  VacationRequestParameter({this.vacationRequestId, this.vacationStatus});
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'vacationRequestId': this.vacationRequestId,
+        'vacationStatus': this.vacationStatus.index,
+      };
+}
