@@ -45,7 +45,6 @@ class _MyHomePageState extends State<MyHomePage> {
         isLoading = false;
       });
     });
-
     print(selectedUser);
   }
 
@@ -129,7 +128,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     return ListView.builder(
                       itemCount: vacationSnap.data.length,
                       itemBuilder: (BuildContext context, int index) {
-                        var vacationRequest = vacationSnap.data[index];
+                        VacationRequest vacationRequest =
+                            vacationSnap.data[index];
                         return Card(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -143,6 +143,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                     "${getSelectedVacationDateInDays(vacationRequest)} day vacation selected"),
                                 Text(
                                     "Description: ${vacationRequest.description}"),
+                                selectedUser.isEmployer
+                                    ? Text(
+                                        "Employee: ${vacationRequest.user.email}")
+                                    : Container(),
                                 getStatusIcon(vacationRequest.status),
                                 isEditable(vacationRequest)
                                     ? Row(
@@ -151,15 +155,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                         children: [
                                           RaisedButton(
                                             onPressed: () async {
-                                              changeVacationRequest(
-                                                      vacationRequest.id,
-                                                      VacationStatus.Approved)
-                                                  .then((result) {
-                                                setState(() {
-                                                  vacationSnap.data[index] =
-                                                      result;
-                                                });
-                                              });
+                                              showDialog(
+                                                context: context,
+                                                child: approveDialog(
+                                                    context,
+                                                    vacationRequest,
+                                                    vacationSnap,
+                                                    index),
+                                              );
                                             },
                                             color: Colors.green,
                                             child: Text(
@@ -170,15 +173,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                           ),
                                           RaisedButton(
                                             onPressed: () async {
-                                              changeVacationRequest(
-                                                      vacationRequest.id,
-                                                      VacationStatus.Declined)
-                                                  .then((result) {
-                                                setState(() {
-                                                  vacationSnap.data[index] =
-                                                      result;
-                                                });
-                                              });
+                                              showDialog(
+                                                  context: context,
+                                                  child: declineDialog(
+                                                      context,
+                                                      vacationRequest,
+                                                      vacationSnap,
+                                                      index));
                                             },
                                             color: Colors.red,
                                             child: Text("Decline"),
@@ -196,13 +197,39 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async => await makeVacationRequest(),
-          tooltip: 'Hey',
-          child: Icon(Icons.add),
-        ), // This trailing comma makes auto-formatting nicer for build methods.
+        floatingActionButton: selectedUser.isEmployee
+            ? FloatingActionButton(
+                onPressed: () async => await makeVacationRequest(),
+                tooltip: 'Hey',
+                child: Icon(Icons.add),
+              )
+            : null, // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );
+  }
+
+  void decline(
+      VacationRequest vacationRequest, AsyncSnapshot vacationSnap, int index) {
+    this.isLoading = true;
+    changeVacationRequest(vacationRequest.id, VacationStatus.Declined)
+        .then((result) {
+      setState(() {
+        vacationSnap.data[index] = result;
+        this.isLoading = false;
+      });
+    });
+  }
+
+  void approve(
+      VacationRequest vacationRequest, AsyncSnapshot vacationSnap, int index) {
+    this.isLoading = true;
+    changeVacationRequest(vacationRequest.id, VacationStatus.Approved)
+        .then((result) {
+      setState(() {
+        vacationSnap.data[index] = result;
+        this.isLoading = false;
+      });
+    });
   }
 
   bool isEditable(VacationRequest vacationRequest) {
@@ -230,6 +257,52 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       default:
     }
+  }
+
+  approveDialog(context, vacationRequest, vacationSnap, index) {
+    return AlertDialog(
+      title: Text("Are you sure to approve vacation request?"),
+      actions: [
+        FlatButton(
+          child: YesDialogText(),
+          onPressed: () {
+            print('Ok');
+            approve(vacationRequest, vacationSnap, index);
+            Navigator.pop(context);
+          },
+        ),
+        FlatButton(
+          child: CancelDialogText(),
+          onPressed: () {
+            print('cancel');
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  declineDialog(context, vacationRequest, vacationSnap, index) {
+    return AlertDialog(
+      title: Text("Are you sure to decline vacation request?"),
+      actions: [
+        FlatButton(
+          child: YesDialogText(),
+          onPressed: () {
+            print('Ok');
+            decline(vacationRequest, vacationSnap, index);
+            Navigator.pop(context);
+          },
+        ),
+        FlatButton(
+          child: CancelDialogText(),
+          onPressed: () {
+            print('cancel');
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
   }
 
   makeVacationRequest() async {
@@ -271,5 +344,33 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       future = getVacationList();
     });
+  }
+}
+
+class YesDialogText extends StatelessWidget {
+  const YesDialogText({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      "Yes",
+      style: TextStyle(color: Colors.green),
+    );
+  }
+}
+
+class CancelDialogText extends StatelessWidget {
+  const CancelDialogText({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      "Cancel",
+      style: TextStyle(color: Colors.red),
+    );
   }
 }

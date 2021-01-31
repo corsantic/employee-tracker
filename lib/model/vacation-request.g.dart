@@ -1,4 +1,4 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+// GENERATED CODE - DO NOT MODIFY BY HAND i modified  ahaahahahahah
 
 part of 'vacation-request.dart';
 
@@ -14,6 +14,7 @@ VacationRequest _$VacationRequestFromJson(Map<String, dynamic> json) {
     description: json['description'] as String,
     startDate: DateTime.parse(json['startDate'] as String),
     endDate: DateTime.parse(json['endDate'] as String),
+    user: User.fromJson(json['user'] as Map<String, dynamic>),
   );
 }
 
@@ -25,4 +26,5 @@ Map<String, dynamic> _$VacationRequestToJson(VacationRequest instance) =>
       'description': instance.description,
       'startDate': instance.startDate.toIso8601String(),
       'endDate': instance.endDate.toIso8601String(),
+      'user': instance.user,
     };
